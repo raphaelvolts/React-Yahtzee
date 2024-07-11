@@ -69,7 +69,7 @@ const sixes = new TotalOneNumber({ val: 6 });
 const threeOfKind = new SumDistro({ count: 3 });
 const fourOfKind = new SumDistro({ count: 4 });
 
-const fullHouse = new FullHouse({ count: 3 });
+const fullHouse = new FullHouse({ count: 3, score: 25 });
 
 const smallStraight = new SmallStraight({ score: 30 });
 const largeStraight = new LargeStraight({ score: 40 });

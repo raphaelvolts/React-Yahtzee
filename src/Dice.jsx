@@ -7,13 +7,15 @@ export default function Dice({ dice, locked, handleClick }) {
       {dice.map((d, idx) => {
         let key = `die-${idx}`;
         let islocked = locked[idx];
-        <Die
-          handleClick={handleClick}
-          val={d}
-          locked={islocked}
-          idx={idx}
-          key={key}
-        />;
+        return (
+          <Die
+            handleClick={() => handleClick(idx)}
+            val={d}
+            locked={islocked}
+            idx={idx}
+            key={key}
+          />
+        );
       })}
     </div>
   );
