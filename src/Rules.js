@@ -32,17 +32,19 @@ class SumDistro extends Rule {
 
 class FullHouse extends Rule {
   evalRoll = (dice) => {
-    const d = new Set(dice);
-    return d.size === 2 && this.freq(dice).some((c) => c === this.count)
-      ? this.score
-      : 0;
+    const freq = this.freq(dice);
+    return freq.includes(2) && freq.includes(3) ? this.score : 0;
   };
 }
 
 class SmallStraight extends Rule {
   evalRoll = (dice) => {
     const d = new Set(dice);
-    return d.size >= 4 && d.has(3) ? this.score : 0;
+    if (d.has(2) && d.has(3) && d.has(4) && (d.has(1) || d.has(5))) {
+      return this.score;
+    } else if (d.has(3) && d.has(4) && d.has(5) && (d.has(2) || d.has(6))) {
+      return this.score;
+    } else return 0;
   };
 }
 
@@ -69,7 +71,7 @@ const sixes = new TotalOneNumber({ val: 6 });
 const threeOfKind = new SumDistro({ count: 3 });
 const fourOfKind = new SumDistro({ count: 4 });
 
-const fullHouse = new FullHouse({ count: 3, score: 25 });
+const fullHouse = new FullHouse({ score: 25 });
 
 const smallStraight = new SmallStraight({ score: 30 });
 const largeStraight = new LargeStraight({ score: 40 });

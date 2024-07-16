@@ -9,6 +9,17 @@
   align-items: center;
 }
 
+.Game-Header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.App-Title {
+  align-items: center;
+  justify-content: center;
+}
+
 h2 {
   font-weight: 100;
   font-size: 2em;
