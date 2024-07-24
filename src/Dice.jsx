@@ -1,7 +1,7 @@
 import Die from "./Die";
 import "./Dice.css";
 
-export default function Dice({ dice, locked, handleClick }) {
+export default function Dice({ dice, locked, handleClick, disabled, rolling }) {
   return (
     <div className="Dice">
       {dice.map((d, idx) => {
@@ -14,6 +14,8 @@ export default function Dice({ dice, locked, handleClick }) {
             locked={islocked}
             idx={idx}
             key={key}
+            disabled={disabled}
+            rolling={rolling}
           />
         );
       })}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Dice from "./Dice";
 import ScoreTable from "./ScoreTable";
 import "./Game.css";
@@ -6,9 +6,11 @@ import "./Game.css";
 const NUM_DICE = 5;
 const NUM_ROLLS = 3;
 const gameParameters = {
-  dice: Array.from({ length: NUM_DICE }),
+  gameStart: false,
+  dice: Array.from({ length: NUM_DICE }, (_, i) => i + 1),
   locked: Array(NUM_DICE).fill(false),
   rollsLeft: NUM_ROLLS,
+  rolling: false,
   scores: {
     ones: undefined,
     twos: undefined,
@@ -28,7 +30,19 @@ const gameParameters = {
 
 export default function Game() {
   const [gameState, setGameState] = useState(gameParameters);
+  console.log(gameState.dice);
+  if (!gameState.gameStart) {
+    setGameState((gs) => ({ ...gs, gameStart: true }));
+    animateRoll();
+  }
 
+  function animateRoll() {
+    setGameState((gs) => ({
+      ...gs,
+      rolling: true
+    }));
+    setTimeout(roll, 1000);
+  }
   function roll() {
     setGameState((gs) => ({
       ...gs,
@@ -36,19 +50,22 @@ export default function Game() {
         gs.locked[i] ? d : Math.ceil(Math.random() * 6)
       ),
       locked: gs.rollsLeft > 1 ? gs.locked : Array(NUM_DICE).fill(true),
-      rollsLeft: gs.rollsLeft - 1
+      rollsLeft: gs.rollsLeft - 1,
+      rolling: false
     }));
   }
 
   function toggleLocked(idx) {
-    setGameState((gs) => ({
-      ...gs,
-      locked: [
-        ...gs.locked.slice(0, idx),
-        !gs.locked[idx],
-        ...gs.locked.slice(idx + 1)
-      ]
-    }));
+    if (gameState.rollsLeft > 0) {
+      setGameState((gs) => ({
+        ...gs,
+        locked: [
+          ...gs.locked.slice(0, idx),
+          !gs.locked[idx],
+          ...gs.locked.slice(idx + 1)
+        ]
+      }));
+    }
   }
 
   function doScore(ruleName, ruleFn) {
@@ -58,9 +75,24 @@ export default function Game() {
       rollsLeft: NUM_ROLLS,
       locked: Array(NUM_DICE).fill(false)
     }));
-    roll();
+    animateRoll();
   }
 
+  function rollsInfo() {
+    const message = [
+      "0 Rolls Left",
+      "1 Roll Left",
+      "2 Rolls Left",
+      "Starting Round"
+    ];
+    return message[gameState.rollsLeft];
+  }
+  const isRollPossible =
+    gameState.rolling ||
+    gameState.rollsLeft <= 0 ||
+    gameState.locked.every((c) => c)
+      ? true
+      : false;
   return (
     <div className="Game">
       <header className="Game-Header">
@@ -70,19 +102,25 @@ export default function Game() {
             dice={gameState.dice}
             locked={gameState.locked}
             handleClick={toggleLocked}
+            disabled={isRollPossible}
+            rolling={gameState.rolling}
           />
           <div className="Game-ButtonWrapper">
             <button
               className="Game-Reroll"
-              disabled={gameState.locked.every((x) => x)}
-              onClick={roll}
+              disabled={isRollPossible}
+              onClick={animateRoll}
             >
-              {gameState.rollsLeft} Rerolls left
+              {rollsInfo()}
             </button>
           </div>
         </section>
       </header>
-      <ScoreTable doScore={doScore} scores={gameState.scores} />
+      <ScoreTable
+        doScore={doScore}
+        scores={gameState.scores}
+        rolling={gameState.rolling}
+      />
     </div>
   );
 }

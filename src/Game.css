@@ -69,6 +69,11 @@ h2 {
   outline: none;
 }
 
+.Game-Reroll[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .Game-Description {
   font-style: italic;
   color: white;

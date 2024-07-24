@@ -1,19 +1,24 @@
 import "./RuleRow.css";
 
-export default function RuleRow({ name, score, doScore }) {
+export default function RuleRow({
+  name,
+  score,
+  doScore,
+  description,
+  rolling
+}) {
   return (
     <tr
-      className="RuleRow RuleRow-active"
-      onClick={score ? "" : doScore}
+      className={`RuleRow RuleRow-${
+        score === undefined ? "active" : "disabled"
+      }`}
+      onClick={score !== undefined || rolling ? "" : doScore}
       disabled={score >= 0}
     >
-      <td
-        className="RuleRow-name"
-        style={{ textDecoration: score ? "line-through" : "" }}
-      >
-        {name}
+      <td className="RuleRow-name">{name}</td>
+      <td className="RuleRow-score">
+        {score === undefined ? description : score}
       </td>
-      <td className="RuleRow-score">{score}</td>
     </tr>
   );
 }
