@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import Dice from "./Dice";
 import ScoreTable from "./ScoreTable";
 import "./Game.css";
@@ -6,7 +6,7 @@ import "./Game.css";
 const NUM_DICE = 5;
 const NUM_ROLLS = 3;
 const gameParameters = {
-  gameStart: false,
+  /* gameStart: false, */
   dice: Array.from({ length: NUM_DICE }, (_, i) => i + 1),
   locked: Array(NUM_DICE).fill(false),
   rollsLeft: NUM_ROLLS,
@@ -27,21 +27,37 @@ const gameParameters = {
     chance: undefined
   }
 };
-
+let gameOver = false;
 export default function Game() {
   const [gameState, setGameState] = useState(gameParameters);
-  console.log(gameState.dice);
+  const gameRef = useRef(null);
+
+  /* console.log(gameState.dice);
   if (!gameState.gameStart) {
     setGameState((gs) => ({ ...gs, gameStart: true }));
     animateRoll();
+  } */
+  function isGameOver() {
+    let allScores = Object.values(gameState.scores);
+    let scored = allScores.filter((val) => val !== undefined);
+    if (scored.length === 13) return true;
+    else return false;
   }
+  if (gameRef.current === null) {
+    gameRef.current = "Game Started";
+    animateRoll();
+  }
+  gameOver = isGameOver();
 
   function animateRoll() {
-    setGameState((gs) => ({
-      ...gs,
-      rolling: true
-    }));
-    setTimeout(roll, 1000);
+    if (!gameOver) {
+      setGameState((gs) => ({
+        ...gs,
+        rolling: true
+      }));
+      setTimeout(roll, 1000);
+    } else
+      setGameState((gs) => ({ ...gs, locked: Array(NUM_DICE).fill(true) }));
   }
   function roll() {
     setGameState((gs) => ({
@@ -49,7 +65,8 @@ export default function Game() {
       dice: gs.dice.map((d, i) =>
         gs.locked[i] ? d : Math.ceil(Math.random() * 6)
       ),
-      locked: gs.rollsLeft > 1 ? gs.locked : Array(NUM_DICE).fill(true),
+      locked:
+        gs.rollsLeft > 1 || gameOver ? gs.locked : Array(NUM_DICE).fill(true),
       rollsLeft: gs.rollsLeft - 1,
       rolling: false
     }));
@@ -73,9 +90,12 @@ export default function Game() {
       ...gs,
       scores: { ...gs.scores, [ruleName]: ruleFn(gs.dice) },
       rollsLeft: NUM_ROLLS,
-      locked: Array(NUM_DICE).fill(false)
+      locked:
+        scoredCount > 11
+          ? Array(NUM_DICE).fill(true)
+          : Array(NUM_DICE).fill(false)
     }));
-    animateRoll();
+    if (scoredCount < 12) animateRoll();
   }
 
   function rollsInfo() {
@@ -90,7 +110,8 @@ export default function Game() {
   const isRollPossible =
     gameState.rolling ||
     gameState.rollsLeft <= 0 ||
-    gameState.locked.every((c) => c)
+    gameState.locked.every((c) => c) ||
+    gameOver
       ? true
       : false;
   return (

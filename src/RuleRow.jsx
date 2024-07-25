@@ -12,7 +12,7 @@ export default function RuleRow({
       className={`RuleRow RuleRow-${
         score === undefined ? "active" : "disabled"
       }`}
-      onClick={score !== undefined || rolling ? "" : doScore}
+      onClick={score !== undefined || rolling ? null : doScore}
       disabled={score >= 0}
     >
       <td className="RuleRow-name">{name}</td>
